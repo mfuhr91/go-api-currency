@@ -37,10 +37,6 @@ func (*service) GetLastCurrencies() ([]models.Currency, error) {
 		return currencies, err
 	}
 
-	sort.Slice(currencies, func(i, j int) bool {
-		return currencies[i].Date.After(currencies[j].Date)
-	})
-
 	var lastCurrencies []models.Currency
 
 	var currencyTypes = models.GetCurrencyTypes()
@@ -66,6 +62,10 @@ func (*service) FindAll() ([]models.Currency, error) {
 	if len(currencies) == 0 {
 		return currencies, err
 	}
+
+	sort.Slice(currencies, func(i, j int) bool {
+		return currencies[i].Date.After(currencies[j].Date)
+	})
 
 	return currencies, nil
 }

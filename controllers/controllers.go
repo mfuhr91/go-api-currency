@@ -35,8 +35,8 @@ func (*controller) GetLastCurrencies(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"msg": "There are not any currency"})
 		return
 	}
-	c.JSON(http.StatusOK, currencies)
 
+	c.JSON(http.StatusOK, currencies)
 }
 
 func (*controller) GetAllCurrencies(c *gin.Context) {
@@ -51,13 +51,13 @@ func (*controller) GetAllCurrencies(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"msg": "There are not any currency"})
 		return
 	}
-	c.JSON(http.StatusOK, currencies)
 
+	c.JSON(http.StatusOK, currencies)
 }
+
 func (*controller) AddCurrency(c *gin.Context) {
 
 	currencyService.Save()
 
 	c.JSON(http.StatusCreated, gin.H{"msg": "successfully saved!"})
-
 }

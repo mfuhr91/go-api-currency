@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go-api-currency/controllers"
 	"go-api-currency/repository"
@@ -38,6 +39,8 @@ func main() {
 	scheduler.SaveCurrenciesTask()
 
 	eng := gin.Default()
+
+	eng.Use(cors.Default())
 	eng.GET("/", home)
 	eng.GET("/ping", ping)
 
