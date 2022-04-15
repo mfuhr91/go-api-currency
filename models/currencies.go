@@ -13,36 +13,53 @@ type Currency struct {
 }
 
 type CurrencyType struct {
-	Pair string
-	Type string
+	Pair   string
+	Type   string
+	Listed bool
 }
 
 func GetCurrencyTypes() []CurrencyType {
 	var currencyTypes []CurrencyType
 
 	currencyTypes = append(currencyTypes, CurrencyType{
-		Type: "bitcoin",
-		Pair: "btc_ars",
+		Type:   "bitcoin",
+		Pair:   "btc_ars",
+		Listed: false,
 	})
 	currencyTypes = append(currencyTypes, CurrencyType{
-		Type: "ethereum",
-		Pair: "eth_ars",
+		Type:   "ethereum",
+		Pair:   "eth_ars",
+		Listed: false,
 	})
 	currencyTypes = append(currencyTypes, CurrencyType{
-		Type: "tether",
-		Pair: "tusd_btc",
+		Type:   "tether",
+		Pair:   "tusd_btc",
+		Listed: false,
 	})
 	currencyTypes = append(currencyTypes, CurrencyType{
-		Type: "euroBlue",
-		Pair: "euro_ars",
+		Type:   "euroBlue",
+		Pair:   "euro_ars",
+		Listed: false,
 	})
 	currencyTypes = append(currencyTypes, CurrencyType{
-		Type: "dolarOficial",
-		Pair: "usdo_ars",
+		Type:   "dolarOficial",
+		Pair:   "usdo_ars",
+		Listed: false,
 	})
 	currencyTypes = append(currencyTypes, CurrencyType{
-		Type: "dolarBlue",
-		Pair: "usdb_ars",
+		Type:   "dolarBlue",
+		Pair:   "usdb_ars",
+		Listed: false,
+	})
+	currencyTypes = append(currencyTypes, CurrencyType{
+		Type:   "dolarCCL",
+		Pair:   "usdccl_ars",
+		Listed: false,
+	})
+	currencyTypes = append(currencyTypes, CurrencyType{
+		Type:   "dolarMEP",
+		Pair:   "dolarmep_ars",
+		Listed: false,
 	})
 
 	return currencyTypes

@@ -3,6 +3,7 @@ package repository
 import (
 	"cloud.google.com/go/firestore"
 	"context"
+	"github.com/google/uuid"
 	"go-api-currency/models"
 	"log"
 	"time"
@@ -37,7 +38,10 @@ func (*firestoreRepo) Save(currency *models.Currency) (*models.Currency, error) 
 		}
 	}(client)
 
+	currency.ID = uuid.NewString()
+
 	_, _, err = client.Collection(collection).Add(ctx, map[string]interface{}{
+		"id":        currency.ID,
 		"type":      currency.Type,
 		"buyPrice":  currency.BuyPrice,
 		"sellPrice": currency.SellPrice,
@@ -78,7 +82,7 @@ func (*firestoreRepo) FindAll() ([]models.Currency, error) {
 			break
 		}
 		currency := models.Currency{
-			ID:        doc.Ref.ID,
+			ID:        doc.Data()["id"].(string),
 			Type:      doc.Data()["type"].(string),
 			BuyPrice:  doc.Data()["buyPrice"].(float64),
 			SellPrice: doc.Data()["sellPrice"].(float64),

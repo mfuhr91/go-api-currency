@@ -1,16 +1,44 @@
 package services
 
-func SaveCurrenciesTask() {
+import (
+	"github.com/go-co-op/gocron"
+	"go-api-currency/repository"
+	"log"
+	"time"
+)
+
+var (
+	firestoreRepository = repository.NewFirestoreRepository()
+)
+
+type SchedulerService interface {
+	SaveCurrenciesTask()
+}
+
+type scheduler struct{}
+
+func NewScheduler() SchedulerService {
+	return &scheduler{}
+}
+
+func (*scheduler) SaveCurrenciesTask() {
 
 	// https://pkg.go.dev/github.com/go-co-op/gocron#section-readme
 
-	/*taskScheduler := chrono.NewDefaultTaskScheduler()
+	s := gocron.NewScheduler(time.UTC)
 
-	task, err := taskScheduler.ScheduleAtFixedRate(func(ctx context.Context) {
-		log.Print("Fixed Rate of 5 seconds")
-	}, 5*time.Second)
+	_, err := s.Every(10).Minutes().Do(saveCurrenciesAutomatically)
+	if err != nil {
+		return
+	}
 
-	if err == nil {
-		log.Print("Task has been scheduled successfully.")
-	}*/
+	s.StartAsync()
+}
+
+func saveCurrenciesAutomatically() {
+
+	log.Println("getting the currencies and saving it automatically...")
+	NewCurrencyService(firestoreRepository).Save()
+	log.Println("currencies saved!")
+
 }

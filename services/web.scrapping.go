@@ -31,7 +31,7 @@ func GetWebCurrencies() (models.Currency, error) {
 	currency.SellPrice = math.Round(sellPrice*100) / 100
 
 	currency.Type = constants.EuroBlueType
-	currency.Date = time.Now()
+	currency.Date = time.Now().UTC()
 
 	log.Printf("currency: %v", currency)
 	return currency, err
@@ -132,17 +132,3 @@ func fromEuroBlueWeb() (buyPrice float64, sellPrice float64, err error) {
 
 	return buyPrice, sellPrice, nil
 }
-
-/*
-if(url.equals(PaginaWeb.PARALELO_HOY.getUrl())){
-                columnas = doc.select(".tabla tbody tr").last().children();
-                columnas.remove(0);
-            } else if( url.equals(PaginaWeb.EURO_BLUE.getUrl())){
-                columnas = doc.select(".elementor-column table").first().select("tbody tr").last().children();
-            } else if( url.equals(PaginaWeb.PRECIO_EURO_BLUE.getUrl()) ){
-                columnas = doc.select(".content_reference").last().children().select("p").select(".reference");
-            }
-            precioCompra = columnas.get(0).text().replace("$","");
-            precioVenta = columnas.get(1).text().replace("$","");
-
-*/

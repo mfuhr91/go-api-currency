@@ -15,7 +15,7 @@ type controller struct{}
 type Controller interface {
 	GetLastCurrencies(c *gin.Context)
 	GetAllCurrencies(c *gin.Context)
-	AddCurrency(c *gin.Context) // only for dev
+	AddCurrency(c *gin.Context)
 }
 
 func NewController(service services.CurrencyService) Controller {
@@ -56,11 +56,7 @@ func (*controller) GetAllCurrencies(c *gin.Context) {
 }
 func (*controller) AddCurrency(c *gin.Context) {
 
-	_, err := currencyService.Save()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	currencyService.Save()
 
 	c.JSON(http.StatusCreated, gin.H{"msg": "successfully saved!"})
 

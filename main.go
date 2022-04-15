@@ -14,27 +14,39 @@ func ping(c *gin.Context) {
 }
 
 func home(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"msg": "Welcome to currency-api"})
+	c.JSON(http.StatusOK, gin.H{
+		"Welcome": "Welcome to go-api-currency",
+		"Endpoints": gin.H{
+			"/ping":       "check the api status",
+			"/currencies": "get the latest currencies",
+			"/all":        "get all saved currencies",
+		},
+		"Author": "Mariano Fuhr",
+		"Email":  "mfuhr91@gmail.com",
+	})
 }
 
 var (
 	firestoreRepository = repository.NewFirestoreRepository()
 	currencyService     = services.NewCurrencyService(firestoreRepository)
 	controller          = controllers.NewController(currencyService)
+	scheduler           = services.NewScheduler()
 )
 
 func main() {
 
-	r := gin.Default()
-	r.GET("/", home)
-	r.GET("/ping", ping)
+	scheduler.SaveCurrenciesTask()
 
-	r.GET("/currencies", controller.GetLastCurrencies)
+	eng := gin.Default()
+	eng.GET("/", home)
+	eng.GET("/ping", ping)
 
-	r.GET("/all", controller.GetAllCurrencies)
-	r.POST("/save", controller.AddCurrency)
+	eng.GET("/currencies", controller.GetLastCurrencies)
 
-	err := r.Run(":8080")
+	eng.GET("/all", controller.GetAllCurrencies)
+	//eng.POST("/save", controller.AddCurrency) // only for dev and testing
+
+	err := eng.Run(":8080")
 	if err != nil {
 		log.Fatalf("Cannot start the server: %v ", err.Error())
 		return

@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-api-currency/models"
 	"go-api-currency/utils/constants"
 	"io/ioutil"
@@ -10,7 +11,7 @@ import (
 	"time"
 )
 
-func GetUSD() (currencies []models.Currency, err error) {
+func GetUSDBluelytics() (currencies []models.Currency, err error) {
 
 	log.Println()
 	log.Println("CONNECTING TO API.BLUELYTICS.COM.AR...")
@@ -24,6 +25,13 @@ func GetUSD() (currencies []models.Currency, err error) {
 	responseData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err.Error())
+		return currencies, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		err = fmt.Errorf("error getting the currencies from: %s - statusCode: %v",
+			constants.ApiBluelyticsUrl, resp.Status)
+		log.Printf(err.Error())
 		return currencies, err
 	}
 

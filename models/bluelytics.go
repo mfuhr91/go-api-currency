@@ -2,23 +2,6 @@ package models
 
 import "time"
 
-/*
-public class RespuestaBluelytics {
-    private Valor oficial;
-    private Valor blue;
-    private Valor oficialEuro;
-    private Valor blueEuro;
-    private Date lastUpdate;
-}
-
-public class Valor {
-    private double valueAvg;
-    private double valueSell;
-    private double valueBuy;
-}
-
-*/
-
 type BluelyticsResp struct {
 	Oficial     Valor     `json:"oficial"`
 	Blue        Valor     `json:"blue"`

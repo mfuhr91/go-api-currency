@@ -51,7 +51,6 @@ func GetCrypto(crypto string) models.Currency {
 	buyPriceAdded := false
 	sellPriceAdded := false
 
-	// put it in a new func and get 1 buy and 1 sell
 	for _, book := range books {
 
 		if book.MarkerSide == "buy" && !buyPriceAdded {
@@ -74,7 +73,7 @@ func GetCrypto(crypto string) models.Currency {
 
 	}
 	currency.Type = crypto
-	currency.Date = time.Now()
+	currency.Date = time.Now().UTC()
 
 	log.Println(currency)
 	return currency

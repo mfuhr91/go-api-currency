@@ -14,7 +14,7 @@ var (
 )
 
 type CurrencyService interface {
-	Save() (*models.Currency, error)
+	Save()
 	FindAll() ([]models.Currency, error)
 	GetLastCurrencies() ([]models.Currency, error)
 }
@@ -43,19 +43,18 @@ func (*service) GetLastCurrencies() ([]models.Currency, error) {
 
 	var lastCurrencies []models.Currency
 
-	for _, currency := range currencies {
-		for _, currType := range models.GetCurrencyTypes() {
+	var currencyTypes = models.GetCurrencyTypes()
 
-			if strings.EqualFold(currency.Type, currType.Type) {
+	for _, currency := range currencies {
+		for i, currType := range currencyTypes {
+			if strings.EqualFold(currency.Type, currType.Type) && !currType.Listed {
 				lastCurrencies = append(lastCurrencies, currency)
+				currencyTypes[i].Listed = true
 				break
-			}
-			if len(lastCurrencies) == len(models.GetCurrencyTypes()) {
-				return lastCurrencies, nil
 			}
 		}
 	}
-	return []models.Currency{}, nil
+	return lastCurrencies, nil
 }
 
 func (*service) FindAll() ([]models.Currency, error) {
@@ -71,23 +70,10 @@ func (*service) FindAll() ([]models.Currency, error) {
 	return currencies, nil
 }
 
-func (*service) Save() (*models.Currency, error) {
-	resp, err := SaveCrypto()
-	if err != nil {
-		return resp, err
-	}
-
-	resp, err = SaveEuroBlue()
-	if err != nil {
-		return resp, err
-	}
-
-	err = SaveUSD()
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
+func (*service) Save() {
+	SaveCrypto()
+	SaveEuroBlue()
+	SaveUSD()
 }
 
 func SaveCrypto() (*models.Currency, error) {
@@ -100,6 +86,8 @@ func SaveCrypto() (*models.Currency, error) {
 
 		if currType.Type == constants.EuroBlueType ||
 			currType.Type == constants.DolarOficialType ||
+			currType.Type == constants.DolarCCLType ||
+			currType.Type == constants.DolareMEPType ||
 			currType.Type == constants.DolarBlueType {
 			continue
 		}
