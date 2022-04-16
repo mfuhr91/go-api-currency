@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"go-api-currency/models"
 	"go-api-currency/utils/constants"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -32,7 +33,12 @@ func GetCrypto(crypto string) models.Currency {
 	resp, err := http.Get(url)
 	var currency models.Currency
 
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}(resp.Body)
 	responseData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err.Error())
@@ -75,6 +81,5 @@ func GetCrypto(crypto string) models.Currency {
 	currency.Type = crypto
 	currency.Date = time.Now().UTC()
 
-	log.Println(currency)
 	return currency
 }

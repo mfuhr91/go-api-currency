@@ -4,6 +4,7 @@ import (
 	"go-api-currency/models"
 	"go-api-currency/repository"
 	"go-api-currency/utils/constants"
+	"log"
 	"math"
 	"sort"
 	"strings"
@@ -100,12 +101,14 @@ func SaveCrypto() (*models.Currency, error) {
 		}
 
 		if currency.Type == constants.TetherType {
-			currency.BuyPrice = currencyBitcoin.BuyPrice * currency.BuyPrice
-			currency.SellPrice = currencyBitcoin.SellPrice * currency.SellPrice
+			currency.BuyPrice = currencyBitcoin.BuyPrice / currency.BuyPrice
+			currency.SellPrice = currencyBitcoin.SellPrice / currency.SellPrice
 		}
 
 		currency.BuyPrice = math.Round(currency.BuyPrice*100) / 100
 		currency.SellPrice = math.Round(currency.SellPrice*100) / 100
+
+		log.Println(currency)
 
 		var err error
 		resp, err = firestoreRepo.Save(&currency)

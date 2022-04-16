@@ -10,7 +10,7 @@ const EuroBlueWeb = "https://www.euroblue.com.ar/"
 const BookFilter = "?book="
 const EthereumPair = "eth_ars"
 const BitcoinPair = "btc_ars"
-const TetherPair = "tusd_btc"
+const TetherPair = "btc_usdt"
 
 const BitcoinType = "bitcoin"
 const EthereumType = "ethereum"

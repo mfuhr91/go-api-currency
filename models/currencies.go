@@ -5,7 +5,7 @@ import (
 )
 
 type Currency struct {
-	ID        string    `json:"id" firestore:"ID"`
+	ID        string    `json:"id" firestore:"id"`
 	Type      string    `json:"type" firestore:"type"`
 	BuyPrice  float64   `json:"buyPrice" firestore:"buyPrice"`
 	SellPrice float64   `json:"sellPrice" firestore:"sellPrice"`
@@ -33,7 +33,7 @@ func GetCurrencyTypes() []CurrencyType {
 	})
 	currencyTypes = append(currencyTypes, CurrencyType{
 		Type:   "tether",
-		Pair:   "tusd_btc",
+		Pair:   "usdt_btc",
 		Listed: false,
 	})
 	currencyTypes = append(currencyTypes, CurrencyType{
