@@ -81,6 +81,12 @@ func fromParaleloHoyWeb() (buyPrice float64, sellPrice float64, err error) {
 		log.Printf(err.Error())
 		return buyPrice, sellPrice, err
 	}
+	if buyPrice > sellPrice {
+		tempValue := sellPrice
+
+		sellPrice = buyPrice
+		buyPrice = tempValue
+	}
 
 	return buyPrice, sellPrice, nil
 }

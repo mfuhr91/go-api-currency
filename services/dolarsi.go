@@ -49,11 +49,7 @@ func GetUSD() (currencies []models.Currency, err error) {
 	currency.Date = time.Now().UTC()
 
 	// DOLAR OFICIAL
-	dolarsiRes.ValoresPrincipales.DolarOficial.Venta = strings.Replace(dolarsiRes.ValoresPrincipales.DolarOficial.Venta, ",", ".", 1)
-	dolarsiRes.ValoresPrincipales.DolarOficial.Compra = strings.Replace(dolarsiRes.ValoresPrincipales.DolarOficial.Compra, ",", ".", 1)
-
-	sellPrice, _ := strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarOficial.Venta, 64)
-	buyPrice, _ := strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarOficial.Compra, 64)
+	sellPrice, buyPrice := parseCurrencies(dolarsiRes.ValoresPrincipales.DolarOficial)
 
 	currency.Type = constants.DolarOficialType
 	currency.SellPrice = math.Round(sellPrice*100) / 100
@@ -61,11 +57,7 @@ func GetUSD() (currencies []models.Currency, err error) {
 	currencies = append(currencies, currency)
 
 	// DOLAR BLUE
-	dolarsiRes.ValoresPrincipales.DolarBlue.Venta = strings.Replace(dolarsiRes.ValoresPrincipales.DolarBlue.Venta, ",", ".", 1)
-	dolarsiRes.ValoresPrincipales.DolarBlue.Compra = strings.Replace(dolarsiRes.ValoresPrincipales.DolarBlue.Compra, ",", ".", 1)
-
-	sellPrice, _ = strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarBlue.Venta, 64)
-	buyPrice, _ = strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarBlue.Compra, 64)
+	sellPrice, buyPrice = parseCurrencies(dolarsiRes.ValoresPrincipales.DolarBlue)
 
 	currency.Type = constants.DolarBlueType
 	currency.SellPrice = math.Round(sellPrice*100) / 100
@@ -73,11 +65,7 @@ func GetUSD() (currencies []models.Currency, err error) {
 	currencies = append(currencies, currency)
 
 	// DOLAR CCL
-	dolarsiRes.ValoresPrincipales.DolarCCL.Venta = strings.Replace(dolarsiRes.ValoresPrincipales.DolarCCL.Venta, ",", ".", 1)
-	dolarsiRes.ValoresPrincipales.DolarCCL.Compra = strings.Replace(dolarsiRes.ValoresPrincipales.DolarCCL.Compra, ",", ".", 1)
-
-	sellPrice, _ = strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarCCL.Venta, 64)
-	buyPrice, _ = strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarCCL.Compra, 64)
+	sellPrice, buyPrice = parseCurrencies(dolarsiRes.ValoresPrincipales.DolarCCL)
 
 	currency.Type = constants.DolarCCLType
 	currency.SellPrice = math.Round(sellPrice*100) / 100
@@ -85,11 +73,7 @@ func GetUSD() (currencies []models.Currency, err error) {
 	currencies = append(currencies, currency)
 
 	//DOLAR MEP - BOLSA
-	dolarsiRes.ValoresPrincipales.DolarMEP.Venta = strings.Replace(dolarsiRes.ValoresPrincipales.DolarMEP.Venta, ",", ".", 1)
-	dolarsiRes.ValoresPrincipales.DolarMEP.Compra = strings.Replace(dolarsiRes.ValoresPrincipales.DolarMEP.Compra, ",", ".", 1)
-
-	sellPrice, _ = strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarMEP.Venta, 64)
-	buyPrice, _ = strconv.ParseFloat(dolarsiRes.ValoresPrincipales.DolarMEP.Compra, 64)
+	sellPrice, buyPrice = parseCurrencies(dolarsiRes.ValoresPrincipales.DolarMEP)
 
 	currency.Type = constants.DolareMEPType
 	currency.SellPrice = math.Round(sellPrice*100) / 100
@@ -98,4 +82,21 @@ func GetUSD() (currencies []models.Currency, err error) {
 
 	log.Println(currencies)
 	return currencies, nil
+}
+
+func parseCurrencies(dolar models.Casa) (sellPrice float64, buyPrice float64) {
+
+	dolarSell := strings.Replace(dolar.Venta, ",", ".", 1)
+	dolarBuy := strings.Replace(dolar.Compra, ",", ".", 1)
+
+	sellPrice, _ = strconv.ParseFloat(dolarSell, 64)
+	buyPrice, _ = strconv.ParseFloat(dolarBuy, 64)
+
+	if buyPrice > sellPrice {
+		tempValue := sellPrice
+		sellPrice = buyPrice
+		buyPrice = tempValue
+	}
+
+	return sellPrice, buyPrice
 }
