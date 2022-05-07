@@ -20,3 +20,7 @@ const DolarBlueType = "dolarBlue"
 const DolarOficialType = "dolarOficial"
 const DolarCCLType = "dolarCCL"
 const DolareMEPType = "dolarMEP"
+
+const ProjectId string = "go-currency-api"
+const JsonPath string = "firebase-data.json"
+const Collection string = "currencies"

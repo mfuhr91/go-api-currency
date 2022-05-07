@@ -6,6 +6,7 @@ import (
 	"go-api-currency/controllers"
 	"go-api-currency/repository"
 	"go-api-currency/services"
+	"go-api-currency/utils/config"
 	"log"
 	"net/http"
 )
@@ -35,24 +36,25 @@ var (
 )
 
 func main() {
-
+	
+	config.CreateCredsFile()
 	scheduler.SaveCurrenciesTask()
-
+	
 	eng := gin.Default()
-
+	
 	eng.Use(cors.Default())
 	eng.GET("/", home)
 	eng.GET("/ping", ping)
-
+	
 	eng.GET("/currencies", controller.GetLastCurrencies)
-
+	
 	eng.GET("/all", controller.GetAllCurrencies)
 	//eng.POST("/save", controller.AddCurrency) // only for dev and testing
-
+	
 	err := eng.Run(":8080")
 	if err != nil {
 		log.Fatalf("Cannot start the server: %v ", err.Error())
 		return
 	}
-
+	
 }
