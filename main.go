@@ -40,18 +40,19 @@ func main() {
 	config.CreateCredsFile()
 	scheduler.SaveCurrenciesTask()
 	
-	eng := gin.Default()
+	r := gin.Default()
 	
-	eng.Use(cors.Default())
-	eng.GET("/", home)
-	eng.GET("/ping", ping)
+	r.Use(cors.Default())
+	r.NoRoute(home)
+	r.GET("/", home)
+	r.GET("/ping", ping)
 	
-	eng.GET("/currencies", controller.GetLastCurrencies)
+	r.GET("/currencies", controller.GetLastCurrencies)
 	
-	eng.GET("/all", controller.GetAllCurrencies)
-	//eng.POST("/save", controller.AddCurrency) // only for dev and testing
+	r.GET("/all", controller.GetAllCurrencies)
+	//r.POST("/save", controller.AddCurrency) // only for dev and testing
 	
-	err := eng.Run(":8080")
+	err := r.Run(":8080")
 	if err != nil {
 		log.Fatalf("Cannot start the server: %v ", err.Error())
 		return
