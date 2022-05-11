@@ -104,23 +104,25 @@ func (*firestoreRepo) DeleteOldCurrencies() error {
 		}
 	}(client)
 	
+	var results []time.Time
 	query := client.Collection(constants.Collection).Where("date", "<=", time.Now().Add(-time.Minute*30))
 	for {
 		doc, err := query.Documents(ctx).Next()
 		if err != nil {
-			log.Printf("currencies deleted")
 			break
 		}
-		date := doc.Data()["date"].(time.Time)
-		id := doc.Data()["id"].(string)
 		
-		print(date.String())
-		print(id)
-		_, err = doc.Ref.Delete(ctx)
+		result, err := doc.Ref.Delete(ctx)
 		if err != nil {
 			log.Printf("currency cannot be deleted")
 			continue
 		}
+		
+		results = append(results, result.UpdateTime)
+	}
+	
+	if len(results) != 0 {
+		log.Printf("currencies deleted")
 	}
 	return nil
 }
