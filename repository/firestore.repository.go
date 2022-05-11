@@ -13,6 +13,7 @@ import (
 
 type FirestoreRepository interface {
 	Save(currency *models.Currency) (*models.Currency, error)
+	DeleteOldCurrencies() error
 	FindAll() ([]models.Currency, error)
 }
 
@@ -88,6 +89,40 @@ func (*firestoreRepo) FindAll() ([]models.Currency, error) {
 		currencies = append(currencies, currency)
 	}
 	return currencies, nil
+}
+
+func (*firestoreRepo) DeleteOldCurrencies() error {
+	client, ctx, err := firestoreConnect()
+	if err != nil {
+		return err
+	}
+	
+	defer func(client *firestore.Client) {
+		err := client.Close()
+		if err != nil {
+			return
+		}
+	}(client)
+	
+	query := client.Collection(constants.Collection).Where("date", "<=", time.Now().Add(-time.Minute*30))
+	for {
+		doc, err := query.Documents(ctx).Next()
+		if err != nil {
+			log.Printf("currencies deleted")
+			break
+		}
+		date := doc.Data()["date"].(time.Time)
+		id := doc.Data()["id"].(string)
+		
+		print(date.String())
+		print(id)
+		_, err = doc.Ref.Delete(ctx)
+		if err != nil {
+			log.Printf("currency cannot be deleted")
+			continue
+		}
+	}
+	return nil
 }
 
 func firestoreConnect() (*firestore.Client, context.Context, error) {
