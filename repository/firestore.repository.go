@@ -8,12 +8,13 @@ import (
 	"go-api-currency/utils/constants"
 	"google.golang.org/api/option"
 	"log"
+	"strings"
 	"time"
 )
 
 type FirestoreRepository interface {
-	Save(currency *models.Currency) (*models.Currency, error)
-	DeleteOldCurrencies() error
+	Save(currencies []models.Currency) ([]models.Currency, error)
+	UpdateCurrencies([]models.Currency) error
 	FindAll() ([]models.Currency, error)
 }
 
@@ -23,7 +24,7 @@ func NewFirestoreRepository() FirestoreRepository {
 	return &firestoreRepo{}
 }
 
-func (*firestoreRepo) Save(currency *models.Currency) (*models.Currency, error) {
+func (*firestoreRepo) Save(currencies []models.Currency) ([]models.Currency, error) {
 	client, ctx, err := firestoreConnect()
 	if err != nil {
 		return nil, err
@@ -36,20 +37,29 @@ func (*firestoreRepo) Save(currency *models.Currency) (*models.Currency, error) 
 		}
 	}(client)
 	
-	currency.ID = uuid.NewString()
-	
-	_, _, err = client.Collection(constants.Collection).Add(ctx, map[string]interface{}{
-		"id":        currency.ID,
-		"type":      currency.Type,
-		"buyPrice":  currency.BuyPrice,
-		"sellPrice": currency.SellPrice,
-		"date":      currency.Date,
-	})
-	if err != nil {
-		log.Printf("failed saving the currency: %v", err.Error())
-		return nil, err
+	var curreniesNotSaved []models.Currency
+	for _, item := range currencies {
+		
+		item.ID = uuid.NewString()
+		
+		_, _, err = client.Collection(constants.Collection).Add(ctx, map[string]interface{}{
+			"id":        item.ID,
+			"type":      item.Type,
+			"buyPrice":  item.BuyPrice,
+			"sellPrice": item.SellPrice,
+			"date":      item.Date,
+		})
+		if err != nil {
+			curreniesNotSaved = append(curreniesNotSaved, item)
+		}
 	}
-	return currency, nil
+	if len(curreniesNotSaved) != 0 {
+		for _, item := range curreniesNotSaved {
+			log.Printf("failed saving the currency: %v", item)
+		}
+	}
+	log.Printf("all currencies saved")
+	return currencies, nil
 }
 
 func (*firestoreRepo) FindAll() ([]models.Currency, error) {
@@ -91,7 +101,7 @@ func (*firestoreRepo) FindAll() ([]models.Currency, error) {
 	return currencies, nil
 }
 
-func (*firestoreRepo) DeleteOldCurrencies() error {
+func (*firestoreRepo) UpdateCurrencies(currencies []models.Currency) error {
 	client, ctx, err := firestoreConnect()
 	if err != nil {
 		return err
@@ -105,25 +115,48 @@ func (*firestoreRepo) DeleteOldCurrencies() error {
 	}(client)
 	
 	var results []time.Time
-	query := client.Collection(constants.Collection).Where("date", "<=", time.Now().Add(-time.Minute*30))
+	
+	iterator := client.Collection(constants.Collection).Documents(ctx)
+	
 	for {
-		doc, err := query.Documents(ctx).Next()
+		doc, err := iterator.Next()
+		
 		if err != nil {
 			break
 		}
-		
-		result, err := doc.Ref.Delete(ctx)
-		if err != nil {
-			log.Printf("currency cannot be deleted")
-			continue
+		var currency models.Currency
+		for _, item := range currencies {
+			if strings.EqualFold(item.Type, doc.Data()["type"].(string)) {
+				currency = item
+				break
+			}
 		}
-		
+		result, err := doc.Ref.Update(ctx, []firestore.Update{
+			{
+				Path:  "date",
+				Value: currency.Date,
+			},
+			{
+				Path:  "buyPrice",
+				Value: currency.BuyPrice,
+			},
+			{
+				Path:  "sellPrice",
+				Value: currency.SellPrice,
+			},
+		})
+		if err != nil {
+			return err
+		}
 		results = append(results, result.UpdateTime)
 	}
 	
-	if len(results) != 0 {
-		log.Printf("currencies deleted")
+	if len(results) == 0 {
+		log.Printf("currencies not updated")
 	}
+	
+	log.Printf("all currencies updated")
+	
 	return nil
 }
 

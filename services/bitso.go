@@ -13,12 +13,12 @@ import (
 )
 
 func GetCrypto(crypto string) models.Currency {
-
+	
 	log.Println()
 	log.Println("CONNECTING TO API.BITSO.COM...")
-
+	
 	url := constants.BitsoUrl + constants.BookFilter
-
+	
 	switch crypto {
 	case constants.BitcoinType:
 		url = url + constants.BitcoinPair
@@ -29,10 +29,10 @@ func GetCrypto(crypto string) models.Currency {
 	default:
 		return models.Currency{}
 	}
-
+	
 	resp, err := http.Get(url)
 	var currency models.Currency
-
+	
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -44,42 +44,42 @@ func GetCrypto(crypto string) models.Currency {
 		log.Println(err.Error())
 		return currency
 	}
-
+	
 	var bitsoResponse models.BitsoResponse
 	err = json.Unmarshal(responseData, &bitsoResponse)
-
+	
 	if err != nil {
 		log.Println(err.Error())
 		return currency
 	}
 	books := bitsoResponse.Payload
-
+	
 	buyPriceAdded := false
 	sellPriceAdded := false
-
+	
 	for _, book := range books {
-
+		
 		if book.MarkerSide == "buy" && !buyPriceAdded {
 			currency.BuyPrice, err = strconv.ParseFloat(book.Price, 64)
 			if err != nil {
 				log.Println("error trying to parse the buy price")
 			}
-
+			
 			buyPriceAdded = true
-
+			
 		}
 		if book.MarkerSide == "sell" && !sellPriceAdded {
 			currency.SellPrice, err = strconv.ParseFloat(book.Price, 64)
 			if err != nil {
 				log.Println("error trying to parse the sell price")
 			}
-
+			
 			sellPriceAdded = true
 		}
-
+		
 	}
 	currency.Type = crypto
 	currency.Date = time.Now().UTC()
-
+	
 	return currency
 }

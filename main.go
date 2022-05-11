@@ -36,26 +36,26 @@ var (
 )
 
 func main() {
-	
+
 	config.CreateCredsFile()
 	scheduler.SaveCurrenciesTask()
-	
+
 	r := gin.Default()
-	
+
 	r.Use(cors.Default())
 	r.NoRoute(home)
 	r.GET("/", home)
 	r.GET("/ping", ping)
-	
+
 	r.GET("/currencies", controller.GetLastCurrencies)
-	
+
 	r.GET("/all", controller.GetAllCurrencies)
 	//r.POST("/save", controller.AddCurrency) // only for dev and testing
-	
+
 	err := r.Run(":8080")
 	if err != nil {
 		log.Fatalf("Cannot start the server: %v ", err.Error())
 		return
 	}
-	
+
 }

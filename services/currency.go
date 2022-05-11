@@ -74,26 +74,32 @@ func (*service) FindAll() ([]models.Currency, error) {
 	return currencies, nil
 }
 
-func deleteOldCurrencies() error {
-	err := firestoreRepo.DeleteOldCurrencies()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (*service) Save() {
-	saveCrypto()
-	saveEuroBlue()
-	saveUSD()
-	deleteOldCurrencies()
+	currencies, _ := getCrypto()
+	
+	currency, _ := getEuroBlue()
+	currencies = append(currencies, currency)
+	
+	currenciesUSD, _ := getUSD()
+	for _, item := range currenciesUSD {
+		currencies = append(currencies, item)
+	}
+	
+	result, _ := firestoreRepo.FindAll()
+	if len(result) == 0 {
+		_, _ = firestoreRepo.Save(currencies)
+		log.Println("currencies saved!")
+		return
+	}
+	
+	_ = firestoreRepo.UpdateCurrencies(currencies)
+	log.Println("currencies updated!")
 }
 
-func saveCrypto() (*models.Currency, error) {
-	var resp *models.Currency
-	
+func getCrypto() ([]models.Currency, error) {
 	currencyTypes := models.GetCurrencyTypes()
 	
+	var currencies []models.Currency
 	var currencyBitcoin models.Currency
 	for _, currType := range currencyTypes {
 		
@@ -122,35 +128,32 @@ func saveCrypto() (*models.Currency, error) {
 		
 		log.Println(currency)
 		
-		var err error
-		resp, err = firestoreRepo.Save(&currency)
-		if err != nil {
-			return &currency, err
-		}
+		currencies = append(currencies, currency)
 	}
-	return resp, nil
+	return currencies, nil
 }
 
-func saveEuroBlue() (*models.Currency, error) {
-	var resp *models.Currency
+func getEuroBlue() (models.Currency, error) {
 	
 	currency, err := GetWebCurrencies()
 	if err != nil {
-		return &currency, err
+		return currency, err
 	}
 	
-	resp, err = firestoreRepo.Save(&currency)
-	return resp, nil
+	return currency, nil
 }
 
-func saveUSD() (err error) {
+func getUSD() ([]models.Currency, error) {
+	var results []models.Currency
+	
 	currencies, err := GetUSD()
 	if err != nil {
-		return err
+		return results, nil
 	}
 	
 	for _, currency := range currencies {
-		_, err = firestoreRepo.Save(&currency)
+		results = append(results, currency)
 	}
-	return nil
+	
+	return results, nil
 }

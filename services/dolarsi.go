@@ -100,3 +100,9 @@ func parseCurrencies(dolar models.Casa) (sellPrice float64, buyPrice float64) {
 	
 	return sellPrice, buyPrice
 }
+
+/*
+func (s Sequence) Swap(i, j int) {
+    s[i], s[j] = s[j], s[i]
+}
+*/
