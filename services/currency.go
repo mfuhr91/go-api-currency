@@ -41,6 +41,10 @@ func (*service) GetLastCurrencies() ([]models.Currency, error) {
 	
 	var currencyTypes = models.GetCurrencyTypes()
 	
+	sort.Slice(currencies, func(i, j int) bool {
+		return currencies[i].Date.After(currencies[j].Date)
+	})
+	
 	for _, currency := range currencies {
 		for i, currType := range currencyTypes {
 			if strings.EqualFold(currency.Type, currType.Type) && !currType.Listed {
